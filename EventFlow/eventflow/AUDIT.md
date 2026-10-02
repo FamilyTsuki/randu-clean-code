@@ -2,7 +2,7 @@
 
 ## 1. Comportement observable
 
-À compléter.
+l'on constate que cela nous afiche une série d'information dont le moyen de paiment, le totale, le status du mail, ... et plusieurs autre information. 
 
 ## 2. Problèmes identifiés
 
