@@ -110,16 +110,12 @@ try {
     $tests->same('Unknown payment method', $e->getMessage(), 'unknown payment method throws expected RuntimeException');
 }
 
-try {
-    ob_start();
-    $payfast = createBooking('standard', 'day', 50.0, 1);
-    $service->confirm($payfast, 'payfast');
-    ob_end_clean();
-    $tests->same(true, false, 'payfast currently throws RuntimeException');
-} catch (RuntimeException $e) {
-    ob_end_clean();
-    $tests->same('PayFast not implemented', $e->getMessage(), 'payfast currently throws not implemented RuntimeException');
-}
+ob_start();
+$payfast = createBooking('standard', 'day', 50.0, 1);
+$payfastTotal = $service->confirm($payfast, 'payfast');
+$outputPayfast = ob_get_clean();
+$tests->near(50.0, $payfastTotal, 'payfast payment works correctly (ticket #103)');
+$tests->same(true, str_contains($outputPayfast, 'SUPERVISION: Demande de paiement de 50 EUR via PayFast'), 'ticket #105: supervision decorates payfast payment');
 
 // Tests Ticket #104 : Actions apres confirmation
 ob_start();
