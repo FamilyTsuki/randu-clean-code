@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 final class BookingService
 {
-    public function __construct(
-        private BookingPricingService $pricingService
-    ) {
+    private PaymentService $paymentService;
+
+    public function __construct(?PaymentService $paymentService = null)
+    {
+        $this->paymentService = $paymentService ?? new PaymentService();
     }
 
     public function confirm(Booking $booking, string $paymentMethod = 'stripe'): float
@@ -21,15 +23,7 @@ final class BookingService
 
         $total = $this->pricingService->calculate($booking);
 
-        if ($paymentMethod === 'stripe') {
-            $stripe = new StripeClient();
-            $transactionId = $stripe->charge($total);
-            echo "PAYMENT {$transactionId}" . PHP_EOL;
-        } elseif ($paymentMethod === 'payfast') {
-            throw new RuntimeException('PayFast not implemented');
-        } else {
-            throw new RuntimeException('Unknown payment method');
-        }
+        $this->paymentService->pay($total, $paymentMethod);
 
         $booking->status = 'confirmed';
 
