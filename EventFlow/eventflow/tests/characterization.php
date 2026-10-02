@@ -44,12 +44,12 @@ $tests->near(90.0, $vipTotal, 'legacy VIP rule gives 10 percent discount');
 
 $threeDays = createBooking('standard', '3days', 60.0, 2);
 $threeDaysTotal = confirmBooking($service, $threeDays, 'stripe');
-$tests->near(110.0, $threeDaysTotal, 'legacy three day pass discount is 10 euros');
+$tests->near(100.0, $threeDaysTotal, 'three day pass discount is 20 euros (ticket #102)');
 
-// Cumul VIP et pass 3 jours : (120 * 0.9) - 10 = 98.0
+// Cumul VIP et pass 3 jours : (120 * 0.9) - 20 = 88.0
 $vipThreeDays = createBooking('vip', '3days', 60.0, 2);
 $vipThreeDaysTotal = confirmBooking($service, $vipThreeDays, 'stripe');
-$tests->near(98.0, $vipThreeDaysTotal, 'legacy cumulative discount: VIP 10% then 3days pass -10 euros');
+$tests->near(88.0, $vipThreeDaysTotal, 'cumulative discount: VIP 10% then 3days pass -20 euros (ticket #102)');
 
 // Panier avec plusieurs articles : 2 x 50 + 1 x 30 = 130.0
 $multi = new Booking(2, new Customer(2, new Email('multi@example.com')), 'day');
