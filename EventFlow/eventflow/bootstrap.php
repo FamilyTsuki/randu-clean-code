@@ -17,3 +17,4 @@ require_once __DIR__ . '/src/StripeAdapter.php';
 require_once __DIR__ . '/src/PayFastAdapter.php';
 require_once __DIR__ . '/src/PaymentService.php';
 require_once __DIR__ . '/src/BookingService.php';
+require_once __DIR__ . '/src/BookingPricingService.php';
