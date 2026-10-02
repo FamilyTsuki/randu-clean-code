@@ -9,7 +9,8 @@ final class PaymentService
     public function __construct(array $gateways = [])
     {
         $this->gateways = $gateways ?: [
-            'stripe' => new StripeAdapter(),
+            'stripe' => new PaymentSupervisionDecorator(new StripeAdapter(), 'Stripe'),
+            'payfast' => new PaymentSupervisionDecorator(new PayFastAdapter(), 'PayFast'),
         ];
     }
 
@@ -20,9 +21,7 @@ final class PaymentService
 
     public function pay(float $amount, string $paymentMethod = 'stripe'): string
     {
-        if ($paymentMethod === 'payfast' && !isset($this->gateways['payfast'])) {
-            throw new RuntimeException('PayFast not implemented');
-        }
+
 
         if (!isset($this->gateways[$paymentMethod])) {
             throw new RuntimeException('Unknown payment method');
