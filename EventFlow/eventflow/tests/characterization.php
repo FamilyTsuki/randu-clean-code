@@ -121,4 +121,35 @@ try {
     $tests->same('PayFast not implemented', $e->getMessage(), 'payfast currently throws not implemented RuntimeException');
 }
 
+// Tests Ticket #104 : Actions apres confirmation
+ob_start();
+$withPhoneBooking = createBooking('standard', 'day', 50.0, 1, '0612345678');
+$service->confirm($withPhoneBooking, 'stripe');
+$outputWithPhone = ob_get_clean();
+
+$tests->same(true, str_contains($outputWithPhone, 'EMAIL test@example.com'), 'ticket #104: confirmation email is sent');
+$tests->same(true, str_contains($outputWithPhone, 'LOYALTY customer=1 points=50'), 'ticket #104: loyalty points are added');
+$tests->same(true, str_contains($outputWithPhone, 'ANALYTICS booking_confirmed'), 'ticket #104: analytics event is tracked');
+$tests->same(true, str_contains($outputWithPhone, 'SMS 0612345678'), 'ticket #104: SMS is sent when phone is provided');
+
+ob_start();
+$withoutPhoneBooking = createBooking('standard', 'day', 50.0, 1, null);
+$service->confirm($withoutPhoneBooking, 'stripe');
+$outputWithoutPhone = ob_get_clean();
+
+$tests->same(false, str_contains($outputWithoutPhone, 'SMS'), 'ticket #104: SMS is not sent when phone is null');
+
+// Test extensibilite du Pattern Observer (ajout dynamique d'un listener)
+$customCalled = false;
+$customListener = new class($customCalled) implements BookingConfirmationListener {
+    public function __construct(private bool &$called) {}
+    public function onBookingConfirmed(Booking $booking, float $total): void {
+        $this->called = true;
+    }
+};
+$extensibleService = new BookingService();
+$extensibleService->addListener($customListener);
+confirmBooking($extensibleService, createBooking());
+$tests->same(true, $customCalled, 'ticket #104: new reaction can be added dynamically without modifying BookingService (OCP)');
+
 $tests->summary();
