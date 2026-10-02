@@ -31,10 +31,8 @@ final class BookingPricingService
             }
         }
 
-        if ($booking->passType === '3days') {
-            if ($total >= $days_reduction) {
-                $total -= $days_reduction;
-            }
+        if ($booking->passType === '3days' && $total >= $days_reduction) {
+            $total -= $days_reduction;
         }
         if ($total < 0.0) {
             throw new RuntimeException('Total cannot be negative');
