@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 final class BookingService
 {
-    private PaymentService $paymentService;
-
-    public function __construct(?PaymentService $paymentService = null)
-    {
+    public function __construct(
+        private ?BookingPricingService $pricingService = null,
+        private ?PaymentService $paymentService = null
+    ) {
+        $this->pricingService = $pricingService ?? new BookingPricingService();
         $this->paymentService = $paymentService ?? new PaymentService();
     }
 
