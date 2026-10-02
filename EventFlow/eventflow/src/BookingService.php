@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 final class BookingService
 {
+    private array $listeners;
+    
     public function __construct(
         private ?BookingPricingService $pricingService = null,
         private ?PaymentService $paymentService = null,
