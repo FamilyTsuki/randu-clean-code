@@ -6,7 +6,7 @@ final class Customer
 {
     public function __construct(
         public int $id,
-        public string $email,
+        public Email $email,
         public ?string $phone = null,
         public string $type = 'standard'
     ) {

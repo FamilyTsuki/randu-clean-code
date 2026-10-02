@@ -14,7 +14,7 @@ function createBooking(
     int $quantity = 1,
     ?string $phone = '0600000000'
 ): Booking {
-    $customer = new Customer(1, 'test@example.com', $phone, $customerType);
+    $customer = new Customer(1, new Email('test@example.com'), $phone, $customerType);
     $ticket = new Ticket('TEST', 'Ticket test', $price);
     $booking = new Booking(1, $customer, $passType);
     $booking->addItem(new BookingItem($ticket, $quantity));
@@ -52,14 +52,14 @@ $vipThreeDaysTotal = confirmBooking($service, $vipThreeDays, 'stripe');
 $tests->near(98.0, $vipThreeDaysTotal, 'legacy cumulative discount: VIP 10% then 3days pass -10 euros');
 
 // Panier avec plusieurs articles : 2 x 50 + 1 x 30 = 130.0
-$multi = new Booking(2, new Customer(2, 'multi@example.com'), 'day');
+$multi = new Booking(2, new Customer(2, new Email('multi@example.com')), 'day');
 $multi->addItem(new BookingItem(new Ticket('T1', 'Ticket 1', 50.0), 2));
 $multi->addItem(new BookingItem(new Ticket('T2', 'Ticket 2', 30.0), 1));
 $multiTotal = confirmBooking($service, $multi, 'stripe');
 $tests->near(130.0, $multiTotal, 'multiple items total is calculated correctly');
 
 // Client sans telephone
-$noPhone = new Booking(3, new Customer(3, 'nophone@example.com', null), 'day');
+$noPhone = new Booking(3, new Customer(3, new Email('nophone@example.com'), null), 'day');
 $noPhone->addItem(new BookingItem(new Ticket('T1', 'Ticket 1', 40.0), 1));
 $noPhoneTotal = confirmBooking($service, $noPhone, 'stripe');
 $tests->near(40.0, $noPhoneTotal, 'booking succeeds when customer phone is null');
@@ -67,7 +67,7 @@ $tests->near(40.0, $noPhoneTotal, 'booking succeeds when customer phone is null'
 // Tests d'erreurs :D
 try {
     ob_start();
-    $empty = new Booking(4, new Customer(4, 'valid@example.com'), 'day');
+    $empty = new Booking(4, new Customer(4, new Email('valid@example.com')), 'day');
     $service->confirm($empty, 'stripe');
     ob_end_clean();
     $tests->same(true, false, 'empty booking should throw RuntimeException');
@@ -78,8 +78,8 @@ try {
 
 try {
     ob_start();
-    $invalidEmail = createBooking('standard', 'day', 50.0, 1);
-    $invalidEmail->customer->email = 'not-an-email';
+    $invalidCustomer = new Customer(5, new Email('not-an-email'));
+    $invalidEmail = new Booking(5, $invalidCustomer, 'day');
     $service->confirm($invalidEmail, 'stripe');
     ob_end_clean();
     $tests->same(true, false, 'invalid email should throw RuntimeException');

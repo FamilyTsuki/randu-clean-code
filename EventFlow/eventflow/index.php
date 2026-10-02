@@ -6,7 +6,7 @@ require_once __DIR__ . '/bootstrap.php';
 
 $customer = new Customer(
     id: 42,
-    email: 'lea@example.com',
+    email: new Email('lea@example.com'),
     phone: '0612345678',
     type: 'vip'
 );

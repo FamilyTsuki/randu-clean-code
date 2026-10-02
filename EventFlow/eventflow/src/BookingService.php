@@ -18,10 +18,6 @@ final class BookingService
             throw new RuntimeException('Empty booking');
         }
 
-        if (!filter_var($booking->customer->email, FILTER_VALIDATE_EMAIL)) {
-            throw new RuntimeException('Invalid email');
-        }
-
         $total = $this->pricingService->calculate($booking);
 
         $this->paymentService->pay($total, $paymentMethod);
