@@ -5,8 +5,11 @@ declare(strict_types=1);
 final class BookingItem
 {
     public function __construct(
-        public Ticket $ticket,
-        public int $quantity
+        public readonly Ticket $ticket,
+        public readonly int $quantity
     ) {
+        if ($quantity <= 0) {
+            throw new RuntimeException('Invalid quantity');
+        }
     }
 }

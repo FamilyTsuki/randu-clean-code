@@ -20,7 +20,7 @@ final class BookingPricingService
             $total += $item->ticket->price * $item->quantity;
         }
 
-        if ($booking->customer->type === 'vip') {
+        if ($booking->customer->isVip()) {
             if ($total < $vip_tiers[0]) {
                 $total *= $vip_reduction[0];
             } else if ($total < $vip_tiers[1]) {

@@ -28,7 +28,7 @@ final class BookingService
 
     public function confirm(Booking $booking, string $paymentMethod = 'stripe'): float
     {
-        if (count($booking->items) === 0) {
+        if ($booking->isEmpty()) {
             throw new RuntimeException('Empty booking');
         }
 
@@ -36,9 +36,9 @@ final class BookingService
 
         $this->paymentService->pay($total, $paymentMethod);
 
-        $booking->status = 'confirmed';
+        $booking->markAsConfirmed();
 
-        echo "SQL INSERT booking={$booking->id} total={$total} status={$booking->status}" . PHP_EOL;
+        echo "SQL INSERT booking={$booking->id} total={$total} status={$booking->getStatus()}" . PHP_EOL;
 
         foreach ($this->listeners as $listener) {
             $listener->onBookingConfirmed($booking, $total);
