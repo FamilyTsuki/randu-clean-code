@@ -4,19 +4,34 @@ declare(strict_types=1);
 
 final class PaymentService
 {
+    private array $gateways = [];
+    
+    public function __construct(array $gateways = [])
+    {
+        $this->gateways = $gateways ?: [
+            'stripe' => new StripeAdapter(),
+        ];
+    }
+
+    public function registerGateway(string $name, PaymentGateway $gateway): void
+    {
+        $this->gateways[$name] = $gateway;
+    }
+
     public function pay(float $amount, string $paymentMethod = 'stripe'): string
     {
-        if ($paymentMethod === 'stripe') {
-            $stripe = new StripeClient();
-            $transactionId = $stripe->charge($amount);
-            echo "PAYMENT {$transactionId}" . PHP_EOL;
-            return $transactionId;
-        }
-
-        if ($paymentMethod === 'payfast') {
+        if ($paymentMethod === 'payfast' && !isset($this->gateways['payfast'])) {
             throw new RuntimeException('PayFast not implemented');
         }
 
-        throw new RuntimeException('Unknown payment method');
+        if (!isset($this->gateways[$paymentMethod])) {
+            throw new RuntimeException('Unknown payment method');
+        }
+
+        $transactionId = $this->gateways[$paymentMethod]->pay($amount);
+        echo "PAYMENT {$transactionId}" . PHP_EOL;
+
+        return $transactionId;
     }
 }
+
