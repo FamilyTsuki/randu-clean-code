@@ -5,7 +5,7 @@ declare(strict_types=1);
 final class BookingPricingService
 {
     private const VIP_REDUCTION = [0.95, 0.90, 0.85];
-    private const VIP_TIERS = [100.0, 299.0];
+    private const VIP_TIERS = [100.0, 300.0];
     private const PASS_3_DAYS_DISCOUNT = 20.0;
 
     public function calculate(Booking $booking): float
