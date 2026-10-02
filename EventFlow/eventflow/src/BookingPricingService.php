@@ -17,13 +17,24 @@ final class BookingPricingService
         }
 
         if ($booking->customer->type === 'vip') {
-            $total *= 0.90;
+            if ($total < 100.0) {
+                $total *= 0.95;
+            } else if ($total < 299.0) {
+                $total *= 0.90;
+            }
+            else {
+                $total *= 0.85;
+            }
         }
 
         if ($booking->passType === '3days') {
-            $total -= 10.0;
+            if ($total >= 20) {
+                $total -= 20.0;
+            }
         }
-
+        if ($total < 0.0) {
+            throw new RuntimeException('Total cannot be negative');
+        }
         return $total;
     }
 }
